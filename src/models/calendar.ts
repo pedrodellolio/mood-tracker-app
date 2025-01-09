@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { Timestamp } from "firebase/firestore";
+
 export enum Mood {
   DEFAULT = 0,
   AWESOME = 1,
@@ -8,9 +11,17 @@ export enum Mood {
 }
 
 export interface Day {
-  index: number;
-  name: string;
-  date: string;
+  id: string;
+  index: number; // 1 - 31
+  name: string; // Sunday - Saturday
+  date: Date;
+  mood: Mood;
+}
+
+export interface FirebaseDay {
+  id: string;
+  userId: string;
+  date: Timestamp;
   mood: Mood;
 }
 
@@ -24,3 +35,14 @@ export interface Week {
   index: number;
   days: Day[];
 }
+
+export const updateDateFields = (day: Day) => {
+  const dayIndex = parseInt(format(day.date, "d"), 10); // 1-31
+  const dayName = format(day.date, "EEEE"); // Sunday-Saturday
+
+  return {
+    ...day,
+    index: dayIndex,
+    name: dayName,
+  };
+};

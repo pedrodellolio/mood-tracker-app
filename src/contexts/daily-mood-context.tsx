@@ -1,3 +1,4 @@
+import ToastActions from "@/components/toast-actions";
 import { Day, Mood } from "@/models/calendar";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -5,6 +6,7 @@ import { toast } from "sonner";
 interface DailyMoodContextData {
   days: Day[];
   setMoodByDay: (mood: Mood, day: Day) => void;
+  clearChanges: () => void;
 }
 
 const DailyMoodContext = createContext<DailyMoodContextData>(
@@ -15,6 +17,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   const [days, setDays] = useState<Day[]>([]);
   const [isToastOpen, setIsToastOpen] = useState(false);
 
+  const clearChanges = () => setDays([]);
   useEffect(() => {
     if (days.length == 0) {
       // Dismiss toast if days array is empty
@@ -25,7 +28,14 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
 
     if (!isToastOpen) {
       // Prevent toast from opening again if it is already open
-      toast("Mood updated", { duration: Infinity, id: "mood" });
+      toast("Mood updated", {
+        classNames: {
+          toast: "flex-row justify-between",
+        },
+        duration: Infinity,
+        id: "mood",
+        action: <ToastActions />,
+      });
       setIsToastOpen(true);
     }
   }, [days]);
@@ -55,6 +65,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
       value={{
         days,
         setMoodByDay,
+        clearChanges,
       }}
     >
       {children}
