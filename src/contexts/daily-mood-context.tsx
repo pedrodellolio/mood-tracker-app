@@ -1,10 +1,14 @@
 import ToastActions from "@/components/toast-actions";
-import { Day, Mood } from "@/models/calendar";
+import { useAuth } from "@/hooks/use-auth";
+import { areMonthsDifferent } from "@/lib/utils";
+import { Day, Month, Mood } from "@/models/calendar";
+import { getAllDaysFromYear } from "@/services/mood";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface DailyMoodContextData {
-  days: Day[];
+  months: Month[];
   setMoodByDay: (mood: Mood, day: Day) => void;
   clearChanges: () => void;
 }
@@ -14,56 +18,70 @@ const DailyMoodContext = createContext<DailyMoodContextData>(
 );
 
 export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
-  const [days, setDays] = useState<Day[]>([]);
-  const [isToastOpen, setIsToastOpen] = useState(false);
+  const client = useQueryClient();
+  const { user } = useAuth();
+  const { data } = useQuery({
+    queryKey: ["months", user?.uid, 2025],
+    queryFn: () => getAllDaysFromYear(user!.uid, 2025),
+    enabled: !!user,
+  });
 
-  const clearChanges = () => setDays([]);
+  const [months, setMonths] = useState<Month[]>([]);
+  const [initialState, setInitialState] = useState<Month[]>([]);
+
   useEffect(() => {
-    if (days.length == 0) {
-      // Dismiss toast if days array is empty
+    if (data) {
+      setInitialState(data);
+      setMonths(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (!areMonthsDifferent(initialState, months)) {
       toast.dismiss("mood");
-      setIsToastOpen(false);
       return;
     }
+    toast("Mood updated", {
+      classNames: {
+        toast: "flex-row justify-between",
+      },
+      duration: Infinity,
+      id: "mood",
+      action: <ToastActions />,
+    });
+  }, [months]);
 
-    if (!isToastOpen) {
-      // Prevent toast from opening again if it is already open
-      toast("Mood updated", {
-        classNames: {
-          toast: "flex-row justify-between",
-        },
-        duration: Infinity,
-        id: "mood",
-        action: <ToastActions />,
-      });
-      setIsToastOpen(true);
-    }
-  }, [days]);
+  const clearChanges = () => {
+    setMonths(initialState);
+    client.invalidateQueries({ queryKey: ["months"] });
+  };
 
   const setMoodByDay = (mood: Mood, day: Day) => {
-    setDays((prevState) => {
-      if (mood === day.mood) {
-        // If no changes are detected, remove day from the array.
-        return prevState.filter((d) => d.date !== day.date);
-      } else {
-        const dayIndex = prevState.findIndex((d) => d.date === day.date);
+    setMonths((prevState) =>
+      prevState.map((month) => {
+        // Check if the day belongs to the current month
+        const dayIndex = month.days.findIndex((d) => d.date === day.date);
         if (dayIndex >= 0) {
-          // Update mood if day exists
-          const updatedDays = [...prevState];
-          updatedDays[dayIndex] = { ...day, mood };
-          return updatedDays;
-        } else {
-          // Add day to array if it doesn't exist
-          return [...prevState, { ...day, mood }];
+          const updatedDays = [...month.days];
+          if (mood === day.mood) {
+            // Remove the day if the mood is unchanged
+            updatedDays.splice(dayIndex, 1);
+          } else {
+            // Update the mood if the day exists
+            updatedDays[dayIndex] = { ...day, mood };
+          }
+          return { ...month, days: updatedDays };
         }
-      }
-    });
+        // If the day doesn't belong to this month, return the month unchanged
+        return month;
+      })
+    );
   };
 
   return (
     <DailyMoodContext.Provider
       value={{
-        days,
+        months,
         setMoodByDay,
         clearChanges,
       }}

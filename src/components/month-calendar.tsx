@@ -11,7 +11,7 @@ export default function MonthCalendar({ data }: Props) {
   const paddedDays = Array(startDay).fill(null).concat(data.days);
   const weeks = groupDaysInWeeks(paddedDays);
   return (
-    <div key={data.index} className="mt-14">
+    <div key={data.index} className="mb-14">
       <p className="mb-6 font-semibold">{data.name} - 2025</p>
 
       <div className="grid grid-cols-7 gap-1 mb-1">

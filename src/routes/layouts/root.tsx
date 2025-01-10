@@ -11,8 +11,10 @@ function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <DailyMoodProvider>
-          <Outlet />
-          <Toaster />
+          <div className="p-6">
+            <Outlet />
+            <Toaster />
+          </div>
         </DailyMoodProvider>
       </AuthProvider>
     </QueryClientProvider>

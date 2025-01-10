@@ -3,12 +3,14 @@ import { Button } from "./ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { addOrUpdateMoods } from "@/services/mood";
-import { Day } from "@/models/calendar";
+import { Day, Mood } from "@/models/calendar";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function ToastActions() {
-  const { clearChanges, days } = useDailyMood();
+  const { clearChanges, months } = useDailyMood();
+  const { user } = useAuth();
   const { mutateAsync } = useMutation({
-    mutationFn: (days: Day[]) => addOrUpdateMoods(days),
+    mutationFn: (days: Day[]) => addOrUpdateMoods(user!.uid, days),
     onSuccess: () => {
       toast.dismiss("mood");
       clearChanges();
@@ -18,9 +20,15 @@ export default function ToastActions() {
     },
   });
 
-  const undoMoodChanges = () => clearChanges();
+  const undoMoodChanges = () => {
+    clearChanges();
+  };
+
   const saveMoodChanges = () => {
-    mutateAsync(days);
+    const daysWithMoodChanges = months
+      .flatMap((month) => month.days)
+      .filter((day) => day.mood !== Mood.DEFAULT);
+    mutateAsync(daysWithMoodChanges);
   };
 
   return (

@@ -40,12 +40,12 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --mood-0: 216 12% 84%;
-    --mood-1: 120 72.23% 49.19%;
-    --mood-2: 86 72% 49%;
-    --mood-3: 84 34% 65%;
-    --mood-4: 55 72% 49%;
-    --mood-5: 15 72% 49%;
+    --mood-0: 216 12% 84%; /* DEFAULT (Calm Gray) */
+    --mood-1: 140 80% 45%; /* AWESOME (Vibrant Green) */
+    --mood-2: 100 70% 50%; /* GOOD (Bright Lime) */
+    --mood-3: 42 70% 55%; /* NEUTRAL (Warm Yellow) */
+    --mood-4: 10 80% 50%; /* BAD (Soft Red) */
+    --mood-5: 350 80% 45%; /* AWFUL (Deep Crimson) */
     --calendar-card-secondary: 220 14% 96%;
   }
   .dark {
@@ -84,6 +84,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    @apply p-6;
+    /* @apply p-6; */
   }
 }

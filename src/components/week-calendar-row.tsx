@@ -12,7 +12,7 @@ export default function WeekCalendarRow({ data }: Props) {
         return !day ? (
           <div
             key={i}
-            className={`select-none flex justify-end items-start h-14 px-2 py-1 mb-1 text-xs font-semibold text-gray-900 cursor-pointer hover:outline outline-2 outline-offset-1`}
+            className={`select-none flex justify-end items-start h-14 px-2 py-1 mb-1 text-xs font-semibold text-gray-900`}
             style={{
               backgroundColor: "hsl(var(--calendar-card-secondary))",
             }}

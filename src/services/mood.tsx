@@ -5,6 +5,7 @@ import {
   endOfDay,
   endOfYear,
   format,
+  isEqual,
   startOfDay,
   startOfYear,
 } from "date-fns";
@@ -27,7 +28,7 @@ export const getAllDaysFromYear = async (uid: string, year: number) => {
 
     // Merge existing days into the complete set
     const completeDays = allDays.map((day) => {
-      const existingDay = days.find((d) => d.date === day.date);
+      const existingDay = days.find((d) => isEqual(d.date, day.date));
       return existingDay || day;
     });
 
@@ -43,7 +44,7 @@ export const getAllDaysFromYear = async (uid: string, year: number) => {
       return {
         index: monthIndex,
         name: format(new Date(year, index, 1), "MMMM"),
-        days: monthDays,
+        days: [...monthDays], // Ensure a new array reference
       };
     });
 
@@ -113,18 +114,23 @@ export const getDayId = async (date: Date) => {
   }
 };
 
-export const addOrUpdateMoods = async (days: Day[]) => {
+export const addOrUpdateMoods = async (uid: string, days: Day[]) => {
   try {
     const batch = writeBatch(db);
     for (const day of days) {
       const dayId = await getDayId(day.date);
-      var ref = doc(collection(db, "days"));
-      if (dayId)
-        batch.update(doc(db, "days", dayId), {
-          date: day.date,
-          mood: day.mood,
-        });
-      else batch.set(ref, { date: day.date, mood: day.mood });
+      const ref = dayId
+        ? doc(db, "days", dayId) // Reference to the existing document
+        : doc(collection(db, "days")); // Create a new document reference
+      if (dayId) {
+        if (day.mood == Mood.DEFAULT) batch.delete(ref);
+        else
+          batch.update(ref, {
+            date: day.date,
+            mood: day.mood,
+            userId: uid,
+          });
+      } else batch.set(ref, { date: day.date, mood: day.mood, userId: uid });
     }
     batch.commit();
   } catch (err) {
