@@ -79,30 +79,12 @@ export const getDays = async (uid: string): Promise<Day[]> => {
   }
 };
 
-export const getMood = async (date: Date) => {
+export const getDayId = async (uid: string, date: Date) => {
   const dayQuery = query(
     collectionRef,
     where("date", ">=", startOfDay(date)),
     where("date", "<=", endOfDay(date)),
-    limit(1)
-  );
-
-  try {
-    const snapshot = await getDocs(dayQuery);
-    if (snapshot.empty) return Mood.DEFAULT;
-    const data = snapshot.docs[0].data();
-    if (!data) return Mood.DEFAULT;
-    return data.mood as Mood;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const getDayId = async (date: Date) => {
-  const dayQuery = query(
-    collectionRef,
-    where("date", ">=", startOfDay(date)),
-    where("date", "<=", endOfDay(date)),
+    where("userId", "==", uid),
     limit(1)
   );
 
@@ -118,18 +100,21 @@ export const addOrUpdateMoods = async (uid: string, days: Day[]) => {
   try {
     const batch = writeBatch(db);
     for (const day of days) {
-      const dayId = await getDayId(day.date);
+      const dayId = await getDayId(uid, day.date);
       const ref = dayId
         ? doc(db, "days", dayId) // Reference to the existing document
         : doc(collection(db, "days")); // Create a new document reference
+
       if (dayId) {
         if (day.mood == Mood.DEFAULT) batch.delete(ref);
-        else
+        else {
+          console.log("atualizando", day);
           batch.update(ref, {
             date: day.date,
             mood: day.mood,
             userId: uid,
           });
+        }
       } else batch.set(ref, { date: day.date, mood: day.mood, userId: uid });
     }
     batch.commit();
