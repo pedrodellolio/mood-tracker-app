@@ -1,6 +1,6 @@
 import { getMoodColorClass, todayDateString } from "@/lib/date";
 import { useDailyMood } from "@/hooks/use-daily-mood";
-import { Day, Mood } from "@/models/calendar";
+import { Day, Layout, Mood } from "@/models/calendar";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Lock } from "lucide-react";
@@ -8,9 +8,10 @@ import { Lock } from "lucide-react";
 interface Props {
   data: Day;
   index: number;
+  origin: Layout;
 }
 
-export default function DayCalendarCard({ data, index }: Props) {
+export default function DayCalendarCard({ data, index, origin }: Props) {
   const { setMoodByDay } = useDailyMood();
   const isToday = format(data.date, "yyyy-MM-dd") === todayDateString;
   const isUpcomingDay = data.date > new Date();
@@ -38,9 +39,11 @@ export default function DayCalendarCard({ data, index }: Props) {
   return (
     <div
       key={index}
-      className={`relative select-none flex justify-end items-start h-14 px-2 py-1 mb-1 text-xs font-semibold text-gray-900 cursor-pointer hover:outline outline-2 outline-offset-1 
+      className={`relative select-none flex justify-end items-start px-2 py-1 mb-1 text-xs font-semibold text-gray-900 cursor-pointer hover:outline outline-2 
         ${isUpcomingDay ? "outline-gray-500" : "outline-primary"}
-        ${isToday && "text-blue-700"}`}
+        ${isToday && "text-blue-700"}
+        ${origin == Layout.MONTH ? "h-20" : "h-14"}
+        `}
       style={{
         backgroundColor: `hsl(var(--${getMoodColorClass(currentMood)}))`,
       }}

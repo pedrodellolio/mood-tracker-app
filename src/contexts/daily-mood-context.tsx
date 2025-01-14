@@ -1,16 +1,20 @@
 import ToastActions from "@/components/toast-actions";
 import { useAuth } from "@/hooks/use-auth";
+import { currentYear } from "@/lib/date";
 import { areMonthsDifferent } from "@/lib/utils";
 import { Day, Month, Mood } from "@/models/calendar";
 import { getAllDaysFromYear } from "@/services/mood";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface DailyMoodContextData {
   months: Month[];
+  selectedYear: number;
   setMoodByDay: (mood: Mood, day: Day) => void;
   clearChanges: () => void;
+  changeYear: (op: number) => void;
 }
 
 const DailyMoodContext = createContext<DailyMoodContextData>(
@@ -19,15 +23,17 @@ const DailyMoodContext = createContext<DailyMoodContextData>(
 
 export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   const client = useQueryClient();
-  const { user } = useAuth();
-  const { data } = useQuery({
-    queryKey: ["months", user?.uid, 2025],
-    queryFn: () => getAllDaysFromYear(user!.uid, 2025),
-    enabled: !!user,
-  });
+  const { user, userCreationDate } = useAuth();
 
+  const [selectedYear, setSelectedYear] = useState(currentYear);
   const [months, setMonths] = useState<Month[]>([]);
   const [initialState, setInitialState] = useState<Month[]>([]);
+
+  const { data } = useQuery({
+    queryKey: ["months", user?.uid, selectedYear],
+    queryFn: () => getAllDaysFromYear(user!.uid, selectedYear),
+    enabled: !!user && !!selectedYear,
+  });
 
   useEffect(() => {
     if (data) {
@@ -50,6 +56,20 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
       action: <ToastActions />,
     });
   }, [months]);
+
+  const changeYear = (op: number) => {
+    setSelectedYear((prevState) => {
+      const newYear = prevState + op;
+      const userCreationYear = parseInt(
+        format(userCreationDate ?? new Date(), "yyyy")
+      );
+      if (newYear < userCreationYear || newYear > currentYear) {
+        return prevState;
+      }
+
+      return newYear;
+    });
+  };
 
   const clearChanges = () => {
     setMonths(initialState);
@@ -82,8 +102,10 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
     <DailyMoodContext.Provider
       value={{
         months,
+        selectedYear,
         setMoodByDay,
         clearChanges,
+        changeYear,
       }}
     >
       {children}

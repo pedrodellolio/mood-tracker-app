@@ -1,5 +1,6 @@
 import LoadingSpinner from "@/components/loading-spinner";
 import { auth, googleProvider } from "@/lib/firebase";
+import { parse } from "date-fns";
 import {
   onAuthStateChanged,
   signInWithPopup,
@@ -11,8 +12,9 @@ import { toast } from "sonner";
 
 interface AuthContextData {
   user: User | null;
-  isAuth: boolean;
+  userCreationDate: Date | null;
   isLoading: boolean;
+  isAuth: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -27,6 +29,7 @@ export const AuthProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [isAuth, setIsAuth] = useState(false);
+  const [userCreationDate, setUserCreationDate] = useState<Date | null>(null);
 
   useEffect(() => {
     // setIsLoading(true);
@@ -39,6 +42,13 @@ export const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     setIsAuth(!!user);
+    setUserCreationDate(
+      parse(
+        user?.metadata.creationTime ?? "",
+        "EEE, dd MMM yyyy HH:mm:ss 'GMT'",
+        new Date()
+      )
+    );
   }, [user]);
 
   const logout = async () => {
@@ -62,6 +72,7 @@ export const AuthProvider = ({ children }: Props) => {
     <AuthContext.Provider
       value={{
         user,
+        userCreationDate,
         isAuth,
         isLoading,
         signInWithGoogle,

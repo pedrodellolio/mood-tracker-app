@@ -36,6 +36,11 @@ export interface Week {
   days: Day[];
 }
 
+export enum Layout {
+  MONTH,
+  YEAR,
+}
+
 export const updateDateFields = (day: Day) => {
   const dayIndex = parseInt(format(day.date, "d"), 10); // 1-31
   const dayName = format(day.date, "EEEE"); // Sunday-Saturday

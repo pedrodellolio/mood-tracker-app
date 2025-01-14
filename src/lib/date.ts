@@ -1,9 +1,10 @@
-import { format, getDay, startOfMonth } from "date-fns";
+import { format, getDay, getYear, startOfMonth } from "date-fns";
 import { Day, Mood, Week } from "../models/calendar";
 
 export const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export const todayDateString = format(new Date(), "yyyy-MM-dd");
+export const currentYear = getYear(new Date());
 
 export const formatDayMonthYear = (
   day: number,
