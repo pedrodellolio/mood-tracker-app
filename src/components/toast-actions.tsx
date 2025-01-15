@@ -13,13 +13,16 @@ export default function ToastActions() {
     mutationFn: (days: Day[]) => addOrUpdateMoods(user!.uid, days),
     onSuccess: () => {
       toast.dismiss("mood");
+      toast.success("Mood updated successfully.", {
+        duration: 3000,
+      });
       clearChanges();
     },
     onError: () => {
       alert("there was an error");
     },
   });
-  
+
   const undoMoodChanges = () => {
     clearChanges();
   };

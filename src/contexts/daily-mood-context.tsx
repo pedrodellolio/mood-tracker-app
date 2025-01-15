@@ -33,6 +33,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
     queryKey: ["months", user?.uid, selectedYear],
     queryFn: () => getAllDaysFromYear(user!.uid, selectedYear),
     enabled: !!user && !!selectedYear,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
       toast.dismiss("mood");
       return;
     }
-    toast("Mood updated", {
+    toast("Mood updated.", {
       classNames: {
         toast: "flex-row justify-between",
       },
