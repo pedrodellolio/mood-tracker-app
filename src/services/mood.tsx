@@ -20,10 +20,12 @@ import {
 } from "firebase/firestore";
 
 const collectionRef = collection(db, "days");
+const timeout = 10000; //10s
 
 export const getAllDaysFromYear = async (uid: string, year: number) => {
   try {
     const days = await getDays(uid);
+    if (days.length === 0) return [];
     const allDays = generateYearDays(year);
 
     // Merge existing days into the complete set
@@ -56,27 +58,41 @@ export const getAllDaysFromYear = async (uid: string, year: number) => {
 };
 
 export const getDays = async (uid: string): Promise<Day[]> => {
-  try {
-    let days: Day[] = [];
-    const qry = query(collectionRef, where("userId", "==", uid));
-    const snapshot = await getDocs(qry);
-    if (!snapshot.empty) {
-      days = snapshot.docs.map((doc) => {
-        const day = {
-          id: doc.id,
-          index: 0,
-          name: "",
-          date: doc.data().date.toDate(),
-          mood: doc.data().mood,
-        };
-        return updateDateFields(day);
-      });
+  const controller = new AbortController();
+
+  const fetchDoc = new Promise<Day[]>(async (resolve, reject) => {
+    try {
+      let days: Day[] = [];
+      const qry = query(collectionRef, where("userId", "==", uid));
+      const snapshot = await getDocs(qry);
+      if (!snapshot.empty) {
+        days = snapshot.docs.map((doc) => {
+          const day = {
+            id: doc.id,
+            index: 0,
+            name: "",
+            date: doc.data().date.toDate(),
+            mood: doc.data().mood,
+            changed: false,
+          };
+          return updateDateFields(day);
+        });
+      }
+      resolve(days);
+    } catch (err) {
+      console.error(err);
+      reject([]);
     }
-    return days;
-  } catch (err) {
-    console.error(err);
-    return [];
-  }
+  });
+
+  const timeoutPromise = new Promise<Day[]>((_, reject) => {
+    setTimeout(() => {
+      controller.abort();
+      reject(new Error("Request timed out"));
+    }, timeout);
+  });
+
+  return Promise.race([fetchDoc, timeoutPromise]);
 };
 
 export const getDayId = async (uid: string, date: Date) => {
@@ -136,6 +152,7 @@ const generateYearDays = (year: number): Day[] => {
       name: format(date, "EEEE"),
       date: date,
       mood: Mood.DEFAULT,
+      changed: false,
     };
   });
 };

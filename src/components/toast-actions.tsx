@@ -1,33 +1,44 @@
 import { useDailyMood } from "@/hooks/use-daily-mood";
 import { Button } from "./ui/button";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { addOrUpdateMoods } from "@/services/mood";
-import { Day, Mood } from "@/models/calendar";
+import { Day } from "@/models/calendar";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { RefObject } from "react";
+import LoadingSpinner from "./loading-spinner";
 
-export default function ToastActions() {
+interface Props {
+  toastIdRef: RefObject<string | undefined>;
+}
+export default function ToastActions({ toastIdRef }: Props) {
   const { clearChanges, months } = useDailyMood();
   const { user } = useAuth();
-  const { mutateAsync } = useMutation({
+  const { dismiss } = useToast();
+  const { mutateAsync, isPending, error } = useMutation({
     mutationFn: (days: Day[]) => addOrUpdateMoods(user!.uid, days),
     onSuccess: () => {
-      toast.dismiss("mood");
+      dismiss(toastIdRef.current);
+      toastIdRef.current = undefined;
       clearChanges();
     },
     onError: () => {
       alert("there was an error");
     },
   });
-  
+
+  error && console.log(error);
+
   const undoMoodChanges = () => {
     clearChanges();
+    toastIdRef.current = undefined;
   };
 
   const saveMoodChanges = () => {
     const daysWithMoodChanges = months
       .flatMap((month) => month.days)
-      .filter((day) => day.mood !== Mood.DEFAULT);
+      .filter((day) => day.changed);
+
     mutateAsync(daysWithMoodChanges);
   };
 
@@ -36,13 +47,18 @@ export default function ToastActions() {
       <Button
         onClick={undoMoodChanges}
         size={"sm"}
-        variant={"ghost"}
+        variant={"default"}
         className="text-red-600 hover:text-red-600 hover:bg-red-50"
       >
         Undo
       </Button>
-      <Button size={"sm"} type="button" onClick={saveMoodChanges}>
-        Save
+      <Button
+        size={"sm"}
+        type="button"
+        onClick={saveMoodChanges}
+        disabled={isPending}
+      >
+        {isPending ? <LoadingSpinner className="w-10 h-10" /> : "Save"}
       </Button>
     </div>
   );

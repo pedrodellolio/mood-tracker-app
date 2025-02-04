@@ -16,6 +16,7 @@ export interface Day {
   name: string; // Sunday - Saturday
   date: Date;
   mood: Mood;
+  changed: boolean;
 }
 
 export interface FirebaseDay {

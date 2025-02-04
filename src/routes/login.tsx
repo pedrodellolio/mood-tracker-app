@@ -95,7 +95,7 @@ function Login() {
             <Button
               type="button"
               className="w-full"
-              variant={"outline"}
+              variant={"neutral"}
               onClick={loginWithGoogle}
             >
               Login with Google

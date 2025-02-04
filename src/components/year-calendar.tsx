@@ -7,11 +7,11 @@ interface Props {
 
 export default function YearCalendar({ data }: Props) {
   return (
-    <div className="overflow-x-auto overflow-y-hidden px-1">
-    <div className="grid grid-flow-col auto-cols-[minmax(60px,_1fr)] gap-1">
+    <div className="overflow-x-auto overflow-y-hidden">
+    <div className="grid grid-flow-col auto-cols-[minmax(60px,_1fr)] gap-2">
       {data.map((month) => (
         <div key={month.name} className="min-w-[60px]">
-          <p className="text-center text-sm font-semibold text-secondary-foreground/90 mb-2">
+          <p className="text-center text-sm text-secondary font-semibold text-secondary-foreground/90 mb-3">
             {month.name.slice(0, 1)}
           </p>
           {month.days.map((day, i) => (

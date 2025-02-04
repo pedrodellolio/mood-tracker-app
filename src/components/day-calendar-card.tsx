@@ -1,9 +1,10 @@
 import { getMoodColorClass, todayDateString } from "@/lib/date";
 import { useDailyMood } from "@/hooks/use-daily-mood";
 import { Day, Layout, Mood } from "@/models/calendar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { Lock } from "lucide-react";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 
 interface Props {
   data: Day;
@@ -13,9 +14,10 @@ interface Props {
 
 export default function DayCalendarCard({ data, index, origin }: Props) {
   const { setMoodByDay } = useDailyMood();
+  const { isColorblindMode } = useUserPreferences();
+
   const isToday = format(data.date, "yyyy-MM-dd") === todayDateString;
   const isUpcomingDay = data.date > new Date();
-
   const [currentMood, setCurrentMood] = useState(Mood.DEFAULT);
 
   useEffect(() => {
@@ -38,21 +40,55 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
 
   return (
     <div
+      aria-description={currentMood.toString()}
       key={index}
-      className={`relative select-none flex justify-end items-start px-2 py-1 mb-1 text-xs font-semibold text-gray-900 cursor-pointer hover:outline outline-2 
+      className={`hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all rounded-base shadow-shadow border-2 border-border relative select-none flex justify-end items-start px-2 py-1 mb-3 text-xs font-semibold text-gray-900 cursor-pointer 
         ${isUpcomingDay ? "outline-gray-500" : "outline-primary"}
         ${isToday && "text-blue-700"}
         ${origin == Layout.MONTH ? "h-20" : "h-14"}
         `}
       style={{
-        backgroundColor: `hsl(var(--${getMoodColorClass(currentMood)}))`,
+        backgroundColor: `var(--${getMoodColorClass(currentMood)})`,
       }}
       onClick={changeMood}
     >
       {data.index}
       <div className="absolute inset-0 flex items-center justify-center">
-        {isUpcomingDay && <Lock color="gray" opacity={0.5} size={18} />}
+        {isUpcomingDay ? (
+          <Lock color="gray" opacity={0.5} size={18} strokeWidth={3} />
+        ) : (
+          isColorblindMode && (
+            <ResponsiveText text={Mood[currentMood]} breakpoint={600} />
+          )
+        )}
       </div>
     </div>
   );
 }
+
+interface ResponsiveTextProps {
+  text: string;
+  breakpoint: number;
+}
+
+const ResponsiveText = ({ text, breakpoint }: ResponsiveTextProps) => {
+  const [isFull, setIsFull] = useState(true);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => {
+      if (ref.current) {
+        setIsFull(window.innerWidth > breakpoint);
+      }
+    });
+
+    observer.observe(document.body);
+    return () => observer.disconnect();
+  }, [breakpoint]);
+
+  return (
+    <p className={`text-secondaryBlack ${isFull ? "text-xs" : "text-lg"}`} ref={ref}>
+      {isFull ? text : text.slice(0, 1)}
+    </p>
+  );
+};

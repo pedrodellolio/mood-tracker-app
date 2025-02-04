@@ -1,4 +1,5 @@
 import LoadingSpinner from "@/components/loading-spinner";
+import { useToast } from "@/hooks/use-toast";
 import { auth, googleProvider } from "@/lib/firebase";
 import { parse } from "date-fns";
 import {
@@ -8,7 +9,6 @@ import {
   User,
 } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface AuthContextData {
   user: User | null;
@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuth, setIsAuth] = useState(false);
   const [userCreationDate, setUserCreationDate] = useState<Date | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // setIsLoading(true);
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }: Props) => {
     try {
       await signOut(auth);
     } catch (error) {
-      toast.error("Unable to logout.");
+      toast({ title: "Unable to logout." });
     }
   };
 
@@ -64,7 +65,7 @@ export const AuthProvider = ({ children }: Props) => {
       setIsLoading(true);
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
-      toast.error("Unable to login with Google.");
+      toast({ title: "Unable to login with Google." });
     }
   };
 

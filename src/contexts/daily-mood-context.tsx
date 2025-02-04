@@ -1,13 +1,13 @@
 import ToastActions from "@/components/toast-actions";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { currentYear } from "@/lib/date";
 import { areMonthsDifferent } from "@/lib/utils";
 import { Day, Month, Mood } from "@/models/calendar";
 import { getAllDaysFromYear } from "@/services/mood";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { ReactNode, createContext, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { ReactNode, createContext, useEffect, useRef, useState } from "react";
 
 interface DailyMoodContextData {
   months: Month[];
@@ -24,10 +24,11 @@ const DailyMoodContext = createContext<DailyMoodContextData>(
 export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   const client = useQueryClient();
   const { user, userCreationDate } = useAuth();
-
+  const { toast, dismiss } = useToast();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [months, setMonths] = useState<Month[]>([]);
   const [initialState, setInitialState] = useState<Month[]>([]);
+  const toastIdRef = useRef<string>(undefined); // Provide the type (string) for useRef
 
   const { data } = useQuery({
     queryKey: ["months", user?.uid, selectedYear],
@@ -44,17 +45,19 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!areMonthsDifferent(initialState, months)) {
-      toast.dismiss("mood");
+      dismiss(toastIdRef.current);
       return;
     }
-    toast("Mood updated", {
-      classNames: {
-        toast: "flex-row justify-between",
-      },
-      duration: Infinity,
-      id: "mood",
-      action: <ToastActions />,
-    });
+
+    if (!toastIdRef.current) {
+      const { id } = toast({
+        itemID: "mood",
+        title: "Mood updated",
+        duration: Infinity,
+        action: <ToastActions toastIdRef={toastIdRef} />,
+      });
+      toastIdRef.current = id;
+    }
   }, [months]);
 
   const changeYear = (op: number) => {
@@ -88,7 +91,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
             updatedDays.splice(dayIndex, 1);
           } else {
             // Update the mood if the day exists
-            updatedDays[dayIndex] = { ...day, mood };
+            updatedDays[dayIndex] = { ...day, mood, changed: true };
           }
           return { ...month, days: updatedDays };
         }
