@@ -4,8 +4,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/toaster";
 import YearCalendar from "@/components/year-calendar";
 import YearPicker from "@/components/year-picker";
+import YearPicker from "@/components/year-picker";
 import { useDailyMood } from "@/hooks/use-daily-mood";
 import { Layout } from "@/models/calendar";
+import { Calendar, LayoutGrid } from "lucide-react";
 import { Calendar, LayoutGrid } from "lucide-react";
 
 function Home() {
@@ -24,6 +26,7 @@ function Home() {
             </TabsTrigger>
           </TabsList>
 
+          <YearPicker />
           <YearPicker />
         </div>
         <TabsContent value={Layout.MONTH.toString()}>
