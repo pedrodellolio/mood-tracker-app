@@ -1,5 +1,5 @@
 import "./index.css";
-import "@fontsource-variable/public-sans";
+// import "@fontsource-variable/public-sans";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Home from "./routes/home.tsx";
