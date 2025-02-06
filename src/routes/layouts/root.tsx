@@ -4,26 +4,25 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DailyMoodProvider } from "@/contexts/daily-mood-context";
 import { Toaster } from "@/components/ui/toaster";
 import { UserPreferencesProvider } from "@/contexts/user-preferences-context";
-import ErrorBoundary from "@/components/error-boundary";
+import Footer from "@/components/footer";
 
 function RootLayout() {
-  const queryClient = new QueryClient({ defaultOptions: {} });
+  const queryClient = new QueryClient();
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <UserPreferencesProvider>
-            <DailyMoodProvider>
-              <div className="p-6">
-                <Outlet />
-                <Toaster />
-              </div>
-            </DailyMoodProvider>
-          </UserPreferencesProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <UserPreferencesProvider>
+          <DailyMoodProvider>
+            <div className="p-6">
+              <Outlet />
+              <Toaster />
+              <Footer />
+            </div>
+          </DailyMoodProvider>
+        </UserPreferencesProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

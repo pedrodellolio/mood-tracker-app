@@ -24,17 +24,23 @@ const DailyMoodContext = createContext<DailyMoodContextData>(
 export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   const client = useQueryClient();
   const { user, userCreationDate } = useAuth();
-  const { toast, dismiss } = useToast();
+  const { toast } = useToast();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [months, setMonths] = useState<Month[]>([]);
   const [initialState, setInitialState] = useState<Month[]>([]);
   const toastIdRef = useRef<string>(undefined); // Provide the type (string) for useRef
 
-  const { data } = useQuery({
+  const { data, error } = useQuery<Month[]>({
     queryKey: ["months", user?.uid, selectedYear],
     queryFn: () => getAllDaysFromYear(user!.uid, selectedYear),
     enabled: !!user && !!selectedYear,
+    placeholderData: () => [],
+    retry: 1,
   });
+
+  useEffect(() => {
+    if (error) toast.error(error.message ?? "Something went wrong");
+  }, [error, toast]);
 
   useEffect(() => {
     if (data) {
@@ -44,10 +50,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   }, [data]);
 
   useEffect(() => {
-    if (!areMonthsDifferent(initialState, months)) {
-      dismiss(toastIdRef.current);
-      return;
-    }
+    if (!areMonthsDifferent(initialState, months)) return;
 
     if (!toastIdRef.current) {
       const { id } = toast({

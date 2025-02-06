@@ -22,6 +22,7 @@ export default function NavBar() {
 
   return (
     <div className="flex justify-end items-center w-full gap-10 mb-10">
+     
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="noShadow" className="relative h-8 w-8 rounded-full">

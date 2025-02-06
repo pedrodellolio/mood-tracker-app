@@ -17,7 +17,7 @@ export default function YearPicker() {
   const disableNextButton = selectedYear >= currentYear;
 
   return (
-    <div className="flex flex-row items-center justify-between w-full gap-2">
+    <div className="flex flex-row items-center justify-between w-full xl:w-auto gap-2 xl:gap-4">
       <Button
         variant={"neutral"}
         size={"sm"}

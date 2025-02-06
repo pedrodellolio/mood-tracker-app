@@ -20,12 +20,11 @@ import {
 } from "firebase/firestore";
 
 const collectionRef = collection(db, "days");
-const timeout = 10000; //10s
+const timeout = 3000; //3s
 
 export const getAllDaysFromYear = async (uid: string, year: number) => {
   try {
     const days = await getDays(uid);
-    if (days.length === 0) return [];
     const allDays = generateYearDays(year);
 
     // Merge existing days into the complete set
@@ -52,8 +51,7 @@ export const getAllDaysFromYear = async (uid: string, year: number) => {
 
     return months;
   } catch (err) {
-    console.error(err);
-    return [];
+    throw err;
   }
 };
 
@@ -80,15 +78,14 @@ export const getDays = async (uid: string): Promise<Day[]> => {
       }
       resolve(days);
     } catch (err) {
-      console.error(err);
-      reject([]);
+      reject(err);
     }
   });
 
   const timeoutPromise = new Promise<Day[]>((_, reject) => {
     setTimeout(() => {
       controller.abort();
-      reject(new Error("Request timed out"));
+      reject(new Error("Request timed out. Try again later."));
     }, timeout);
   });
 
@@ -124,7 +121,6 @@ export const addOrUpdateMoods = async (uid: string, days: Day[]) => {
       if (dayId) {
         if (day.mood == Mood.DEFAULT) batch.delete(ref);
         else {
-          console.log("atualizando", day);
           batch.update(ref, {
             date: day.date,
             mood: day.mood,

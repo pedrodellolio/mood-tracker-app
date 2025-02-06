@@ -14,23 +14,22 @@ interface Props {
 export default function ToastActions({ toastIdRef }: Props) {
   const { clearChanges, months } = useDailyMood();
   const { user } = useAuth();
-  const { dismiss } = useToast();
-  const { mutateAsync, isPending, error } = useMutation({
+  const { toast, dismiss } = useToast();
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: (days: Day[]) => addOrUpdateMoods(user!.uid, days),
     onSuccess: () => {
-      dismiss(toastIdRef.current);
-      toastIdRef.current = undefined;
-      clearChanges();
+      undoMoodChanges();
     },
-    onError: () => {
-      alert("there was an error");
+    onError: (error) => {
+      toast.error(error ? error.message : "Something went wrong");
+      clearChanges();
+      toastIdRef.current = undefined;
     },
   });
 
-  error && console.log(error);
-
   const undoMoodChanges = () => {
     clearChanges();
+    dismiss(toastIdRef.current);
     toastIdRef.current = undefined;
   };
 

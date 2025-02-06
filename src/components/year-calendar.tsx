@@ -7,7 +7,7 @@ interface Props {
 
 export default function YearCalendar({ data }: Props) {
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
+    <div className="overflow-x-auto overflow-y-hidden p-1">
     <div className="grid grid-flow-col auto-cols-[minmax(60px,_1fr)] gap-2">
       {data.map((month) => (
         <div key={month.name} className="min-w-[60px]">
