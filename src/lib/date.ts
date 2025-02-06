@@ -1,5 +1,5 @@
 import { format, getDay, getYear, startOfMonth } from "date-fns";
-import { Day, Mood, Week } from "../models/calendar";
+import { Day, Week } from "../models/calendar";
 
 export const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
