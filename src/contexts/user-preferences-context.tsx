@@ -1,8 +1,15 @@
-import { Dispatch, ReactNode, createContext, useState } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface UserPreferencesContextData {
   isColorblindMode: boolean;
-  setIsColorblindMode: Dispatch<React.SetStateAction<boolean>>;
+  setIsColorblindMode: Dispatch<SetStateAction<boolean>>;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextData>(
@@ -14,8 +21,17 @@ export const UserPreferencesProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [isColorblindMode, setIsColorblindMode] = useState(false);
+  const storedColorblindMode = localStorage.getItem("colorblindMode");
+  const initialColorblindMode = storedColorblindMode
+    ? JSON.parse(storedColorblindMode)
+    : false;
 
+  const [isColorblindMode, setIsColorblindMode] = useState(initialColorblindMode);
+
+  useEffect(() => {
+    localStorage.setItem('colorblindMode', JSON.stringify(isColorblindMode));
+  }, [isColorblindMode]);
+  
   return (
     <UserPreferencesContext.Provider
       value={{
