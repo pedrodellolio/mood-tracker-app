@@ -20,7 +20,7 @@ import {
 } from "firebase/firestore";
 
 const collectionRef = collection(db, "days");
-const timeout = 3000; //3s
+const timeout = 5000; //3s
 
 export const getAllDaysFromYear = async (uid: string, year: number) => {
   try {
