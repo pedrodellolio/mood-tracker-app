@@ -31,26 +31,36 @@
 
   --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
 
-  --mood-0: #bebebe; /* DEFAULT (Calm Gray) */
-  --mood-1: #5df73f ; /* AWESOME (Vibrant Green) */
-  --mood-2: #4ab442; /* GOOD (Bright Lime) */
-  --mood-3: #D9A441; /* NEUTRAL (Warm Yellow) */
-  --mood-4: #ff6721 ; /* BAD (Soft Red) */
-  --mood-5: #e73c29; /* AWFUL (Deep Crimson) */
+  --mood-0: #C4C4C4; /* DEFAULT */
+  --mood-1: #5df73f; /* AWESOME */
+  --mood-2: #4ab442; /* GOOD */
+  --mood-3: #d9a441; /* NEUTRAL */
+  --mood-4: #ff6721; /* BAD */
+  --mood-5: #e73c29; /* AWFUL */
+
+  --mood-colorblind-0: #C4C4C4; /* DEFAULT */
+  --mood-colorblind-1: #009E73; /* AWESOME */
+  --mood-colorblind-2: #0072B2; /* GOOD */
+  --mood-colorblind-3: #E69F00; /* NEUTRAL */
+  --mood-colorblind-4: #D55E00; /* BAD */
+  --mood-colorblind-5: #CC0000; /* AWFUL */
 }
 
 body {
   background-image: radial-gradient(rgba(0, 0, 0, 0.137) 1px, transparent 1px);
   background-size: 20px 20px;
-  font-family: 'Public Sans Variable', sans-serif;
+  font-family: "Public Sans Variable", sans-serif;
 }
 
 /* public-sans-latin-wght-normal */
 @font-face {
-  font-family: 'Public Sans Variable';
+  font-family: "Public Sans Variable";
   font-style: normal;
   font-display: swap;
   font-weight: 100 900;
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/public-sans:vf@latest/latin-wght-normal.woff2) format('woff2-variations');
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/public-sans:vf@latest/latin-wght-normal.woff2)
+    format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
 }

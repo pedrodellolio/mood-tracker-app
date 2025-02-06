@@ -19,6 +19,7 @@ export default function YearPicker() {
   return (
     <div className="flex flex-row items-center justify-between w-full xl:w-auto gap-2 xl:gap-4">
       <Button
+        title="Previous Year"
         variant={"neutral"}
         size={"sm"}
         onClick={() => changeYear(-1)}
@@ -26,10 +27,11 @@ export default function YearPicker() {
       >
         <ChevronLeft />
       </Button>
-      <p className="font-semibold text-secondary-foreground/90 cursor-pointer hover:bg-secondary px-4 py-1 rounded-md">
+      <p className="font-semibold text-secondary-foreground/90 cursor-pointer hover:border-2 border-border px-4 py-1 rounded-md">
         {selectedYear}
       </p>
       <Button
+        title="Next Year"
         variant={"neutral"}
         size={"sm"}
         onClick={() => changeYear(1)}

@@ -1,3 +1,5 @@
+import { Skeleton } from "../ui/skeleton";
+
 export default function YearCalendarSkeleton() {
   // Simulating a calendar grid
   const months = Array.from({ length: 12 }, (_, index) => index + 1).map(
@@ -14,11 +16,11 @@ export default function YearCalendarSkeleton() {
       <div className="grid grid-flow-col auto-cols-[minmax(60px,_1fr)] gap-1">
         {months.map((month) => (
           <div key={month.index} className="min-w-[60px]">
-            <p className="animate-pulse h-6 bg-secondary text-center text-sm font-semibold text-secondary-foreground/90 mb-2"></p>
+            <Skeleton className="h-6 mb-2" />
             {month.days.map((day) => (
               <div
                 key={day}
-                className={`animate-pulse select-none flex justify-end items-start h-20 px-2 py-1 mb-1 text-xs font-semibold text-gray-900`}
+                className={`h-14 animate-pulse rounded-base border-2 mb-1 border-skeleton shadow-shadow`}
                 style={{
                   backgroundColor: "hsl(var(--calendar-card-secondary))",
                 }}

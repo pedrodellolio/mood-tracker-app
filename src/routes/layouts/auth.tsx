@@ -1,6 +1,5 @@
-import { Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import { useAuth } from "@/hooks/use-auth";
-import Login from "../login";
 import NavBar from "@/components/navbar";
 
 function AuthLayout() {
@@ -14,7 +13,7 @@ function AuthLayout() {
       </div>
     </>
   ) : (
-    <Login />
+    <Navigate to="login" />
   );
 }
 

@@ -1,4 +1,4 @@
-import { Month } from "@/models/calendar";
+import { Month, Mood } from "@/models/calendar";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -49,6 +49,11 @@ export function enumToArray<T extends Record<string, string | number>>(
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
+
+// Get the mood color variable
+export const getMoodColorClass = (mood: Mood, isColorblindMode: boolean) => {
+  return `mood${isColorblindMode ? "-colorblind" : ""}-${mood}`;
+};
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

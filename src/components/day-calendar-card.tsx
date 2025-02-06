@@ -1,10 +1,11 @@
-import { getMoodColorClass, todayDateString } from "@/lib/date";
+import { todayDateString } from "@/lib/date";
 import { useDailyMood } from "@/hooks/use-daily-mood";
 import { Day, Layout, Mood } from "@/models/calendar";
 import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { Lock } from "lucide-react";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
+import { getMoodColorClass } from "@/lib/utils";
 
 interface Props {
   data: Day;
@@ -39,16 +40,22 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
   };
 
   return (
-    <div
+    <button
+      title={isUpcomingDay ? "We're not there yet." : ""}
       aria-description={currentMood.toString()}
       key={index}
-      className={`hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all rounded-base shadow-shadow border-2 border-border relative select-none flex justify-end items-start px-2 py-1 mb-3 text-xs font-semibold text-gray-900 cursor-pointer 
+      className={`${
+        !isUpcomingDay &&
+        "hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"
+      } transition-all rounded-base shadow-shadow border-2 border-border relative flex justify-end items-start px-2 py-1 mb-3 text-xs font-semibold text-gray-900 cursor-pointer 
         ${isUpcomingDay ? "outline-gray-500" : "outline-primary"}
         ${isToday && "text-blue-700"}
-        ${origin == Layout.MONTH ? "h-20" : "h-14"}
-        `}
+        ${origin == Layout.MONTH ? "h-20" : "h-14"}`}
       style={{
-        backgroundColor: `var(--${getMoodColorClass(currentMood)})`,
+        backgroundColor: `var(--${getMoodColorClass(
+          currentMood,
+          isColorblindMode
+        )})`,
       }}
       onClick={changeMood}
     >
@@ -57,12 +64,13 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
         {isUpcomingDay ? (
           <Lock color="gray" opacity={0.5} size={18} strokeWidth={3} />
         ) : (
-          isColorblindMode && (
+          isColorblindMode &&
+          currentMood !== Mood.DEFAULT && (
             <ResponsiveText text={Mood[currentMood]} breakpoint={600} />
           )
         )}
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -87,7 +95,10 @@ const ResponsiveText = ({ text, breakpoint }: ResponsiveTextProps) => {
   }, [breakpoint]);
 
   return (
-    <p className={`text-secondaryBlack ${isFull ? "text-xs" : "text-lg"}`} ref={ref}>
+    <p
+      className={`text-secondaryBlack ${isFull ? "text-xs" : "text-lg"}`}
+      ref={ref}
+    >
       {isFull ? text : text.slice(0, 1)}
     </p>
   );

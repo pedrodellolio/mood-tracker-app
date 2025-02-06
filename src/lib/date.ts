@@ -44,30 +44,3 @@ export const groupDaysInWeeks = (days: Day[]) => {
 
   return weeks;
 };
-
-// Get the mood color variable
-export const getMoodColorClass = (mood: Mood) => {
-  // let color = "";
-  // switch (mood) {
-  //   case Mood.DEFAULT:
-  //     color = "bg-gray-500";
-  //     break;
-  //   case Mood.AWESOME:
-  //     color = "bg-green-500";
-  //     break;
-  //   case Mood.GOOD:
-  //     color = "bg-green-300";
-  //     break;
-  //   case Mood.NEUTRAL:
-  //     color = "bg-green-100";
-  //     break;
-  //   case Mood.BAD:
-  //     color = "bg-yellow-500";
-  //     break;
-  //   case Mood.AWFUL:
-  //     color = "bg-red-500";
-  //     break;
-  // }
-  // return color;
-  return `mood-${mood}`;
-};

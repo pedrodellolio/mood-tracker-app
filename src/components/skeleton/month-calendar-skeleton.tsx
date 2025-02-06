@@ -1,4 +1,5 @@
 import { DAYS_OF_WEEK } from "@/lib/date";
+import { Skeleton } from "../ui/skeleton";
 
 export default function MonthCalendarSkeleton() {
   // Simulating a calendar grid
@@ -6,7 +7,7 @@ export default function MonthCalendarSkeleton() {
 
   return (
     <div className="mb-14">
-      <p className="animate-pulse mb-6 font-semibold h-6 w-1/6 bg-secondary"></p>
+      <Skeleton className="h-6 w-1/6 mb-6 " />
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {DAYS_OF_WEEK.map((day, i) => (
@@ -18,15 +19,12 @@ export default function MonthCalendarSkeleton() {
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-3">
         {days.map((day) => {
           return (
             <div
               key={day}
-              className={`animate-pulse select-none flex justify-end items-start h-20 px-2 py-1 mb-1 text-xs font-semibold text-gray-900`}
-              style={{
-                backgroundColor: "hsl(var(--calendar-card-secondary))",
-              }}
+              className={`h-20 animate-pulse rounded-base border-2 mb-3 border-skeleton shadow-shadow`}
             ></div>
           );
         })}
