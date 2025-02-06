@@ -7,7 +7,7 @@ interface Props {
 
 export default function WeekCalendarRow({ data }: Props) {
   return (
-    <div key={data.index} className="grid grid-cols-7 gap-3">
+    <div key={data.index} className="grid grid-cols-7 gap-2 sm:gap-3">
       {data.days.map((day, i) => {
         return !day ? (
           <div

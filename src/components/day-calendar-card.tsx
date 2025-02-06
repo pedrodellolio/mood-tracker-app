@@ -47,7 +47,7 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
       className={`${
         !isUpcomingDay &&
         "hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"
-      } transition-all rounded-base shadow-shadow border-2 border-border relative flex justify-end items-start px-2 py-1 mb-3 text-xs font-semibold text-gray-900 cursor-pointer 
+      } w-full transition-all rounded-base shadow-shadow border-2 border-border relative flex justify-end items-start px-2 py-1 mb-3 text-xs font-semibold text-gray-900 cursor-pointer 
         ${isUpcomingDay ? "outline-gray-500" : "outline-primary"}
         ${isToday && "text-blue-700"}
         ${origin == Layout.MONTH ? "h-20" : "h-14"}`}
@@ -66,7 +66,11 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
         ) : (
           isColorblindMode &&
           currentMood !== Mood.DEFAULT && (
-            <ResponsiveText text={Mood[currentMood]} breakpoint={600} />
+            <ResponsiveText
+              text={Mood[currentMood]}
+              breakpoint={600}
+              layout={origin}
+            />
           )
         )}
       </div>
@@ -77,9 +81,10 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
 interface ResponsiveTextProps {
   text: string;
   breakpoint: number;
+  layout: Layout;
 }
 
-const ResponsiveText = ({ text, breakpoint }: ResponsiveTextProps) => {
+const ResponsiveText = ({ text, breakpoint, layout }: ResponsiveTextProps) => {
   const [isFull, setIsFull] = useState(true);
   const ref = useRef(null);
 
@@ -96,10 +101,10 @@ const ResponsiveText = ({ text, breakpoint }: ResponsiveTextProps) => {
 
   return (
     <p
-      className={`text-secondaryBlack ${isFull ? "text-xs" : "text-lg"}`}
+      className={`text-secondaryBlack ${isFull ? "text-xs" : "text-sm"}`}
       ref={ref}
     >
-      {isFull ? text : text.slice(0, 1)}
+      {layout === Layout.YEAR || !isFull ? text.slice(0, 1) : text}
     </p>
   );
 };
