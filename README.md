@@ -22,7 +22,6 @@ O M.O.O.D é uma aplicação web que permite registrar e visualizar como foram s
 - shadcn/ui + neobrutalism
 - Lucide Icons
 - Tanstack Query
----
 
 ## Instalação e Uso
 1. Clone o repositório: `git clone https://github.com/pedrodellolio/mood-tracker-app.git`
