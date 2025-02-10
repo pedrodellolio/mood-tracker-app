@@ -1,17 +1,46 @@
+import LogbookAlert from "@/components/logbook-alert";
 import MonthCalendar from "@/components/month-calendar";
 import MoodLegend from "@/components/mood-legend";
 import MonthCalendarSkeleton from "@/components/skeleton/month-calendar-skeleton";
 import YearCalendarSkeleton from "@/components/skeleton/year-calendar-skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Toaster } from "@/components/ui/toaster";
 import YearCalendar from "@/components/year-calendar";
 import YearPicker from "@/components/year-picker";
-import { useDailyMood } from "@/hooks/use-daily-mood";
+import { useAuth } from "@/hooks/use-auth";
+import { useLogbook } from "@/hooks/use-logbook";
+import { useToast } from "@/hooks/use-toast";
 import { Layout } from "@/models/calendar";
+import { getLogbookByIdOrDefault } from "@/services/logbook";
+import { useQuery } from "@tanstack/react-query";
 import { Calendar, LayoutGrid } from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router";
 
 function Home() {
-  const { months } = useDailyMood();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { logbookId } = useParams();
+  const { months } = useLogbook();
+  const navigate = useNavigate();
+
+  const { data, error } = useQuery({
+    queryKey: ["logbook", user?.uid, logbookId],
+    queryFn: async () => {
+      return await getLogbookByIdOrDefault(user!.uid, logbookId);
+    },
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (error) toast.error(error.message);
+  }, [error, toast]);
+
+  useEffect(() => {
+    if (data && logbookId !== data.id) {
+      navigate(`/${data.id}`);
+    }
+  }, [data, navigate]);
+
   return (
     <div>
       <MoodLegend />
@@ -53,7 +82,8 @@ function Home() {
           )}
         </TabsContent>
       </Tabs>
-      <Toaster />
+
+      <LogbookAlert />
     </div>
   );
 }

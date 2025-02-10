@@ -1,15 +1,19 @@
-import ToastActions from "@/components/toast-actions";
 import { useAuth } from "@/hooks/use-auth";
+import { useLogbookToast } from "@/hooks/use-logbook-toast";
 import { useToast } from "@/hooks/use-toast";
 import { currentYear } from "@/lib/date";
 import { areMonthsDifferent } from "@/lib/utils";
 import { Day, Month, Mood } from "@/models/calendar";
+import { Marker } from "@/models/marker";
+import { getMarkers } from "@/services/marker";
 import { getAllDaysFromYear } from "@/services/mood";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { ReactNode, createContext, useEffect, useRef, useState } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
+import { useParams } from "react-router";
 
-interface DailyMoodContextData {
+interface LogbookContextData {
+  markers: Marker[];
   months: Month[];
   selectedYear: number;
   setMoodByDay: (mood: Mood, day: Day) => void;
@@ -17,29 +21,41 @@ interface DailyMoodContextData {
   changeYear: (op: number) => void;
 }
 
-const DailyMoodContext = createContext<DailyMoodContextData>(
-  {} as DailyMoodContextData
+const LogbookContext = createContext<LogbookContextData>(
+  {} as LogbookContextData
 );
 
-export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
+export const LogbookProvider = ({ children }: { children: ReactNode }) => {
   const client = useQueryClient();
   const { user, userCreationDate } = useAuth();
   const { toast } = useToast();
+  const { openAlert, closeAlert } = useLogbookToast();
+  const { logbookId } = useParams();
+
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [months, setMonths] = useState<Month[]>([]);
   const [initialState, setInitialState] = useState<Month[]>([]);
-  const toastIdRef = useRef<string>(undefined); // Provide the type (string) for useRef
+  // const toastIdRef = useRef<string>(undefined); // Provide the type (string) for useRef
 
   const { data, error } = useQuery<Month[]>({
-    queryKey: ["months", user?.uid, selectedYear],
-    queryFn: () => getAllDaysFromYear(user!.uid, selectedYear),
+    queryKey: ["months", user?.uid, logbookId, selectedYear],
+    queryFn: () => getAllDaysFromYear(user!.uid, logbookId ?? "", selectedYear),
     enabled: !!user && !!selectedYear,
     placeholderData: () => [],
     retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: markers } = useQuery({
+    queryKey: ["markers", logbookId],
+    queryFn: async () => {
+      if (logbookId) return await getMarkers(logbookId);
+    },
+    enabled: !!logbookId,
   });
 
   useEffect(() => {
-    if (error) toast.error(error.message ?? "Something went wrong");
+    if (error) toast.error(error.message);
   }, [error, toast]);
 
   useEffect(() => {
@@ -50,17 +66,11 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   }, [data]);
 
   useEffect(() => {
-    if (!areMonthsDifferent(initialState, months)) return;
-
-    if (!toastIdRef.current) {
-      const { id } = toast({
-        itemID: "mood",
-        title: "Mood updated",
-        duration: Infinity,
-        action: <ToastActions toastIdRef={toastIdRef} />,
-      });
-      toastIdRef.current = id;
+    if (!areMonthsDifferent(initialState, months)) {
+      closeAlert();
+      return;
     }
+    openAlert();
   }, [months]);
 
   const changeYear = (op: number) => {
@@ -105,8 +115,9 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <DailyMoodContext.Provider
+    <LogbookContext.Provider
       value={{
+        markers: markers ?? [],
         months,
         selectedYear,
         setMoodByDay,
@@ -115,7 +126,7 @@ export const DailyMoodProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-    </DailyMoodContext.Provider>
+    </LogbookContext.Provider>
   );
 };
-export default DailyMoodContext;
+export default LogbookContext;

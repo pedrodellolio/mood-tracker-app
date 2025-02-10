@@ -9,20 +9,23 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { LogOut, Palette } from "lucide-react";
+import { LogOut, Menu, Palette } from "lucide-react";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
+import NavBreadcrumb from "./nav-breadcrumb";
 
 export default function NavBar() {
   const { user, logout } = useAuth();
-  const { isColorblindMode, setIsColorblindMode } = useUserPreferences();
-
-  const toggleColorblind = () => {
-    setIsColorblindMode((prevState) => !prevState);
-  };
+  const { isColorblindMode, toggleColorblindMode, toggleSidebar } =
+    useUserPreferences();
 
   return (
-    <div className="flex justify-end items-center w-full gap-10 mb-10">
-     
+    <div className="flex justify-between items-center w-full gap-10 mb-10">
+      <div className="flex items-center gap-12">
+        <Button variant={"noShadow"} size={"icon"} onClick={toggleSidebar}>
+          <Menu />
+        </Button>
+        <NavBreadcrumb />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="noShadow" className="relative h-8 w-8 rounded-full">
@@ -45,7 +48,7 @@ export default function NavBar() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={toggleColorblind}
+            onClick={toggleColorblindMode}
             className="cursor-pointer"
           >
             <Palette className="mr-2 h-4 w-4" />

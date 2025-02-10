@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-import { Timestamp } from "firebase/firestore";
 
 export enum Mood {
   DEFAULT = 0,
@@ -12,18 +11,12 @@ export enum Mood {
 
 export interface Day {
   id: string;
+  // logbookId: string;
   index: number; // 1 - 31
   name: string; // Sunday - Saturday
   date: Date;
   mood: Mood;
   changed: boolean;
-}
-
-export interface FirebaseDay {
-  id: string;
-  userId: string;
-  date: Timestamp;
-  mood: Mood;
 }
 
 export interface Month {
