@@ -124,7 +124,7 @@ export const createDefaultLogbook = async (uid: string) => {
     const name = "Mood";
     const ref = doc(collection(db, "logbooks"));
 
-    doesLogbookExists(uid, name);
+    await doesLogbookExists(uid, name);
 
     batch.set(ref, {
       userId: uid,
@@ -132,7 +132,7 @@ export const createDefaultLogbook = async (uid: string) => {
       isDefault: true,
     });
 
-    createDefaultMarkers(ref.id);
+    await createDefaultMarkers(ref.id);
 
     batch.commit();
   } catch (err) {

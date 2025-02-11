@@ -71,7 +71,7 @@ export default function MarkerItem({ item }: Props) {
           </LoadingButton>
         </div>
 
-        <p className="mt-1">{capitalize(item.name)}</p>
+        <p className="mt-1 truncate">{capitalize(item.name)}</p>
       </li>
 
       {isDrawerOpen && !isDesktop && (

@@ -14,7 +14,7 @@ function AuthLayout() {
     <div className="">
       {isSidebarOpen && <Sidebar />}
       <div
-        className={`py-6 px-4 ${isSidebarOpen && isDesktop && "ml-[220px]"}`}
+        className={`py-6 px-4 md:px-6 ${isSidebarOpen && isDesktop && "ml-[220px]"}`}
       >
         <NavBar />
         <div className="max-w-[820px] mx-auto">

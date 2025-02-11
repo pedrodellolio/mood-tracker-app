@@ -46,6 +46,11 @@ export const deleteMarker = async (mid: string) => {
   }
 };
 
+//TO-DO: The insert order is not guaranteed, i'll need a index field instead of createdAt
+//TO-DO: On login, if there is no logbook created it will create a default one but is not redirecting to it
+//TO-DO: Fix sidebar animation (is odd using edge)
+//TO-DO: Implement a way to delete logbooks
+//TO-DO: Saving changes is not setting the color correctly
 export const createDefaultMarkers = async (lid: string) => {
   try {
     const batch = writeBatch(db);
@@ -55,6 +60,7 @@ export const createDefaultMarkers = async (lid: string) => {
         logbookId: lid,
         name: marker.name,
         createdAt: Timestamp.now(),
+        color: marker.color,
       });
     }
     batch.commit();
