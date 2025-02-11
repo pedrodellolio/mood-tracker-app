@@ -22,9 +22,13 @@ import {
 const collectionRef = collection(db, "days");
 const timeout = 5000; //3s
 
-export const getAllDaysFromYear = async (uid: string, year: number) => {
+export const getAllDaysFromYear = async (
+  uid: string,
+  lid: string,
+  year: number
+) => {
   try {
-    const days = await getDays(uid);
+    const days = await getDays(uid, lid);
     const allDays = generateYearDays(year);
 
     // Merge existing days into the complete set
@@ -55,13 +59,17 @@ export const getAllDaysFromYear = async (uid: string, year: number) => {
   }
 };
 
-export const getDays = async (uid: string): Promise<Day[]> => {
+export const getDays = async (uid: string, lid: string): Promise<Day[]> => {
   const controller = new AbortController();
 
   const fetchDoc = new Promise<Day[]>(async (resolve, reject) => {
     try {
       let days: Day[] = [];
-      const qry = query(collectionRef, where("userId", "==", uid));
+      const qry = query(
+        collectionRef,
+        where("userId", "==", uid),
+        where("logbookId", "==", lid)
+      );
       const snapshot = await getDocs(qry);
       if (!snapshot.empty) {
         days = snapshot.docs.map((doc) => {
@@ -92,12 +100,13 @@ export const getDays = async (uid: string): Promise<Day[]> => {
   return Promise.race([fetchDoc, timeoutPromise]);
 };
 
-export const getDayId = async (uid: string, date: Date) => {
+export const getDayId = async (uid: string, lid: string, date: Date) => {
   const dayQuery = query(
     collectionRef,
     where("date", ">=", startOfDay(date)),
     where("date", "<=", endOfDay(date)),
     where("userId", "==", uid),
+    where("logbookId", "==", lid),
     limit(1)
   );
 
@@ -109,25 +118,32 @@ export const getDayId = async (uid: string, date: Date) => {
   }
 };
 
-export const addOrUpdateMoods = async (uid: string, days: Day[]) => {
+export const addOrUpdateMoods = async (
+  uid: string,
+  lid: string,
+  days: Day[]
+) => {
   try {
     const batch = writeBatch(db);
     for (const day of days) {
-      const dayId = await getDayId(uid, day.date);
+      const dayId = await getDayId(uid, lid, day.date);
       const ref = dayId
         ? doc(db, "days", dayId) // Reference to the existing document
         : doc(collection(db, "days")); // Create a new document reference
 
+      const dayObj = {
+        date: day.date,
+        mood: day.mood,
+        userId: uid,
+        logbookId: lid,
+      };
+
       if (dayId) {
         if (day.mood == Mood.DEFAULT) batch.delete(ref);
         else {
-          batch.update(ref, {
-            date: day.date,
-            mood: day.mood,
-            userId: uid,
-          });
+          batch.update(ref, dayObj);
         }
-      } else batch.set(ref, { date: day.date, mood: day.mood, userId: uid });
+      } else batch.set(ref, dayObj);
     }
     batch.commit();
   } catch (err) {

@@ -1,6 +1,8 @@
 import LoadingSpinner from "@/components/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { auth, googleProvider } from "@/lib/firebase";
+import { createDefaultLogbook, hasAnyLogbooks } from "@/services/logbook";
+import { useQueryClient } from "@tanstack/react-query";
 import { parse } from "date-fns";
 import {
   onAuthStateChanged,
@@ -14,7 +16,6 @@ interface AuthContextData {
   user: User | null;
   userCreationDate: Date | null;
   isLoading: boolean;
-  isAuth: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -28,29 +29,42 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [isAuth, setIsAuth] = useState(false);
   const [userCreationDate, setUserCreationDate] = useState<Date | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    // setIsLoading(true);
     const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       setUser(user);
+      if (user) {
+        validateLogbooks(user.uid);
+        queryClient.invalidateQueries({ queryKey: ["logbooks", user.uid] });
+      }
       setIsLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    setIsAuth(!!user);
-    setUserCreationDate(
-      parse(
-        user?.metadata.creationTime ?? "",
-        "EEE, dd MMM yyyy HH:mm:ss 'GMT'",
-        new Date()
-      )
-    );
+    if (user) {
+      setUserCreationDate(
+        parse(
+          user.metadata.creationTime ?? "",
+          "EEE, dd MMM yyyy HH:mm:ss 'GMT'",
+          new Date()
+        )
+      );
+    }
   }, [user]);
+
+  const validateLogbooks = async (uid: string) => {
+    try {
+      const hasAny = await hasAnyLogbooks(uid);
+      if (!hasAny) await createDefaultLogbook(uid);
+    } catch (error) {
+      toast({ title: "Unable to fetch for Logbooks." });
+    }
+  };
 
   const logout = async () => {
     try {
@@ -74,7 +88,6 @@ export const AuthProvider = ({ children }: Props) => {
       value={{
         user,
         userCreationDate,
-        isAuth,
         isLoading,
         signInWithGoogle,
         logout,

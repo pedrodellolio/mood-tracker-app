@@ -1,15 +1,10 @@
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  createContext,
-  useEffect,
-  useState,
-} from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 
 interface UserPreferencesContextData {
   isColorblindMode: boolean;
-  setIsColorblindMode: Dispatch<SetStateAction<boolean>>;
+  isSidebarOpen: boolean;
+  toggleColorblindMode: () => void;
+  toggleSidebar: () => void;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextData>(
@@ -26,17 +21,30 @@ export const UserPreferencesProvider = ({
     ? JSON.parse(storedColorblindMode)
     : false;
 
-  const [isColorblindMode, setIsColorblindMode] = useState(initialColorblindMode);
+  const [isColorblindMode, setIsColorblindMode] = useState<boolean>(
+    initialColorblindMode
+  );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('colorblindMode', JSON.stringify(isColorblindMode));
+    localStorage.setItem("colorblindMode", JSON.stringify(isColorblindMode));
   }, [isColorblindMode]);
-  
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prevState) => !prevState);
+  };
+
+  const toggleColorblindMode = () => {
+    setIsColorblindMode((prevState) => !prevState);
+  };
+
   return (
     <UserPreferencesContext.Provider
       value={{
         isColorblindMode,
-        setIsColorblindMode,
+        isSidebarOpen,
+        toggleSidebar,
+        toggleColorblindMode,
       }}
     >
       {children}

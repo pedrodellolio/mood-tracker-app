@@ -31,7 +31,7 @@ createRoot(root).render(
     <Routes>
       <Route element={<RootLayout />}>
         <Route element={<AuthLayout />}>
-          <Route index element={<HomePage />} />
+          <Route path=":logbookId?" element={<HomePage />} />
         </Route>
         <Route element={<AnonymousLayout />}>
           <Route path="login" element={<LoginPage />} />

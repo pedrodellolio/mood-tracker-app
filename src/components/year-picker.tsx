@@ -1,4 +1,4 @@
-import { useDailyMood } from "@/hooks/use-daily-mood";
+import { useLogbook } from "@/hooks/use-logbook";
 import { Button } from "./ui/button";
 import { currentYear } from "@/lib/date";
 import { format } from "date-fns";
@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function YearPicker() {
-  const { changeYear, selectedYear } = useDailyMood();
+  const { changeYear, selectedYear } = useLogbook();
   const { userCreationDate } = useAuth();
 
   const userCreationYear = parseInt(
