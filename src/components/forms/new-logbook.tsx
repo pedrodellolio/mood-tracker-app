@@ -69,11 +69,8 @@ export default function NewLogbookForm() {
             </FormItem>
           )}
         />
-        {/* <Button type="submit" className="w-full" disabled={isPending}>
-          Submit
-        </Button> */}
         <LoadingButton className="w-full" loading={isPending}>
-          Submit
+          Create
         </LoadingButton>
       </form>
     </Form>

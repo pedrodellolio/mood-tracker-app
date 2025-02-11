@@ -14,9 +14,11 @@ const MarkerColorPicker = forwardRef<HTMLDivElement, Props>(
     const { isColorblindMode } = useUserPreferences();
 
     const changeColor = () => {
-      const colorValues = Object.values(Mood).filter(
-        (value) => typeof value === "number"
-      ) as number[];
+      const colorValues = Object.values(Mood).filter((value) => {
+        return typeof value === "number" && value !== Mood.DEFAULT;
+      }) as number[];
+
+      console.log(colorValues);
 
       const currentMoodIndex = colorValues.indexOf(value);
       const nextMoodIndex = (currentMoodIndex + 1) % colorValues.length;

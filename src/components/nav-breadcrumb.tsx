@@ -34,9 +34,7 @@ export default function NavBreadcrumb() {
   return (
     <Breadcrumb>
       <BreadcrumbList className="font-bold text-secondaryBlack">
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Logbooks</BreadcrumbLink>
-        </BreadcrumbItem>
+        <BreadcrumbItem>Logbooks</BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink href={`/${data?.id}`}>{data?.name}</BreadcrumbLink>

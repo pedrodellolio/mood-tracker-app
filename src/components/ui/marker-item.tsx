@@ -31,7 +31,6 @@ export default function MarkerItem({ item }: Props) {
   });
 
   const onLongPress = () => {
-    console.log("oi");
     setIsDrawerOpen(true);
   };
 
@@ -49,8 +48,6 @@ export default function MarkerItem({ item }: Props) {
         key={item.id}
         className="group flex flex-row items-center gap-3 text-xs font-semibold text-secondaryBlack"
         {...longPressEvent}
-        onTouchStart={() => console.log("teste")}
-        onTouchEnd={() => console.log("end")}
       >
         <div className="relative">
           <div
@@ -65,8 +62,7 @@ export default function MarkerItem({ item }: Props) {
 
           <LoadingButton
             variant={"noShadow"}
-            className={`absolute -top-2 -right-2 p-1 text-white bg-red-500 rounded-base opacity-0 ${
-              !isDesktop && "group-hover:opacity-100"
+            className={`absolute -top-2 -right-2 p-1 text-white bg-red-500 rounded-base opacity-0 ${"group-hover:opacity-100"
             } transition-opacity h-[18px] w-[18px]`}
             onClick={() => mutateAsync(item.id)}
             loading={isPending}

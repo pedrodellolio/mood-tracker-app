@@ -41,7 +41,7 @@ const useLongPress = (
     );
 
     const clear = useCallback(
-        (event: EventType, shouldTriggerClick = true) => {
+        (_: EventType, shouldTriggerClick = true) => {
             if (timeout.current) {
                 clearTimeout(timeout.current);
             }

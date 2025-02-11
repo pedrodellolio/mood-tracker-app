@@ -43,7 +43,7 @@ export default function NewMarkerForm({ closeCreateMarker }: Props) {
     mode: "onBlur",
     defaultValues: {
       name: "",
-      color: Mood.DEFAULT,
+      color: Mood.AWESOME,
     },
   });
 
@@ -64,7 +64,7 @@ export default function NewMarkerForm({ closeCreateMarker }: Props) {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") event.preventDefault();
-    else if (event.key === "Escape") closeCreateMarker();
+    if (event.key === "Escape") closeCreateMarker();
   };
 
   return (

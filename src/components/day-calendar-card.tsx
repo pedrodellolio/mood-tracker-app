@@ -1,7 +1,7 @@
 import { todayDateString } from "@/lib/date";
 import { useLogbook } from "@/hooks/use-logbook";
 import { Day, Layout, Mood } from "@/models/calendar";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Lock } from "lucide-react";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
@@ -60,50 +60,41 @@ export default function DayCalendarCard({ data, index, origin }: Props) {
     >
       {data.index}
       <div className="absolute inset-0 flex items-center justify-center">
-        {isUpcomingDay ? (
+        {isUpcomingDay && (
           <Lock color="gray" opacity={0.5} size={18} strokeWidth={3} />
-        ) : (
-          isColorblindMode &&
-          currentMood !== Mood.DEFAULT && (
-            <ResponsiveText
-              text={Mood[currentMood]}
-              breakpoint={600}
-              layout={origin}
-            />
-          )
         )}
       </div>
     </button>
   );
 }
 
-interface ResponsiveTextProps {
-  text: string;
-  breakpoint: number;
-  layout: Layout;
-}
+// interface ResponsiveTextProps {
+//   text: string;
+//   breakpoint: number;
+//   layout: Layout;
+// }
 
-const ResponsiveText = ({ text, breakpoint, layout }: ResponsiveTextProps) => {
-  const [isFull, setIsFull] = useState(true);
-  const ref = useRef(null);
+// const ResponsiveText = ({ text, breakpoint, layout }: ResponsiveTextProps) => {
+//   const [isFull, setIsFull] = useState(true);
+//   const ref = useRef(null);
 
-  useEffect(() => {
-    const observer = new ResizeObserver(() => {
-      if (ref.current) {
-        setIsFull(window.innerWidth > breakpoint);
-      }
-    });
+//   useEffect(() => {
+//     const observer = new ResizeObserver(() => {
+//       if (ref.current) {
+//         setIsFull(window.innerWidth > breakpoint);
+//       }
+//     });
 
-    observer.observe(document.body);
-    return () => observer.disconnect();
-  }, [breakpoint]);
+//     observer.observe(document.body);
+//     return () => observer.disconnect();
+//   }, [breakpoint]);
 
-  return (
-    <p
-      className={`text-secondaryBlack ${isFull ? "text-xs" : "text-sm"}`}
-      ref={ref}
-    >
-      {layout === Layout.YEAR || !isFull ? text.slice(0, 1) : text}
-    </p>
-  );
-};
+//   return (
+//     <p
+//       className={`text-secondaryBlack ${isFull ? "text-xs" : "text-sm"}`}
+//       ref={ref}
+//     >
+//       {layout === Layout.YEAR || !isFull ? text.slice(0, 1) : text}
+//     </p>
+//   );
+// };

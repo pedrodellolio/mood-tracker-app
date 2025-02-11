@@ -16,7 +16,6 @@ interface AuthContextData {
   user: User | null;
   userCreationDate: Date | null;
   isLoading: boolean;
-  isAuth: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -30,7 +29,6 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [isAuth, setIsAuth] = useState(false);
   const [userCreationDate, setUserCreationDate] = useState<Date | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -90,7 +88,6 @@ export const AuthProvider = ({ children }: Props) => {
       value={{
         user,
         userCreationDate,
-        isAuth,
         isLoading,
         signInWithGoogle,
         logout,

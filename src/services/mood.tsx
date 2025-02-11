@@ -124,7 +124,6 @@ export const addOrUpdateMoods = async (
   days: Day[]
 ) => {
   try {
-    throw new Error("error");
     const batch = writeBatch(db);
     for (const day of days) {
       const dayId = await getDayId(uid, lid, day.date);
